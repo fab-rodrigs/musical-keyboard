@@ -56,8 +56,12 @@ int main(void)
     __delay_cycles(100000); // Delay para estabilização
 
     escreve_LCD("Teclado Musical!");
-
     cmd_LCD(0xC0,0); // Move o cursor para a segunda linha
+    escreve_LCD("|/|/|/|/|/|/|/|/");
+
+    unsigned char menu_option = 0; // Variável para rastrear a opção do menu
+    unsigned char menu_active = 0; // Variável para saber se o menu está ativo
+    int seq = 0;
 
     while(1)
     {
@@ -69,97 +73,176 @@ int main(void)
                 if(!tst_bit(P2IN, j+3)) // Testa se a linha está pressionada
                 {
                     tecla = teclado[j][i]; // Captura a tecla pressionada
-                    cmd_LCD(0x80,0); // Move o cursor para o início da primeira linha
 
-                    // Adiciona o switch case para executar ações baseadas na tecla pressionada
-                    switch(tecla) {
-                        case '*':
-                            // Abre Menu
-                            cmd_LCD(1, 0);
-                            escreve_LCD("      Menu");
-                            cmd_LCD(0xC0,0); // Move o cursor para a segunda linha
-                            escreve_LCD("Music-Tone-Volum");
-                            break;
+                    if (menu_active) {
+                        // Se o menu estiver ativo, processa as opções do menu
+                        switch(tecla) {
+                            case '6':  // Mais
+                                menu_option++;
+                                if (menu_option > 2) menu_option = 0; // Loop de opções
+                                break;
+                            case '9':  // Menos
+                                menu_option--;
+                                if (menu_option > 2) menu_option = 2; // Loop de opções
+                                break;
+                            case '#':  // Selecionar
+                                if (menu_option == 0) {
+                                    cmd_LCD(1, 0);
+                                    escreve_LCD("DoReMiFa");
+                                    // Música "DoReMiFa"
+                                    int doremi[] = {NOTA_DO, NOTA_RE, NOTA_MI, NOTA_FA, NOTA_FA, NOTA_FA, NOTA_DO, NOTA_RE, NOTA_DO, NOTA_RE, NOTA_RE, NOTA_RE};
+                                    int num_notas = sizeof(doremi) / sizeof(doremi[0]);
 
-                        case '7':
-                            // Toca Dó
-                            setupPWM(NOTA_DO);
-                            cmd_LCD(1, 0);  // Comando para limpar o display
-                            escreve_LCD("    Nota: Do");
-                            cmd_LCD(0xC0,0); // Move o cursor para a segunda linha
-                            escreve_LCD("Frequencia:261Hz");
-                            break;
-                        case '4':
-                            // Toca Ré
-                            setupPWM(NOTA_RE);
-                            cmd_LCD(1, 0);
-                            escreve_LCD("    Nota: Re");
-                            cmd_LCD(0xC0,0); // Move o cursor para a segunda linha
-                            escreve_LCD("Frequencia:294Hz");
-                            break;
-                        case '1':
-                            // Toca Mi
-                            setupPWM(NOTA_MI);
-                            cmd_LCD(1, 0);
-                            escreve_LCD("    Nota: Mi");
-                            cmd_LCD(0xC0,0); // Move o cursor para a segunda linha
-                            escreve_LCD("Frequencia:330Hz");
-                            break;
-                        case '0':
-                            // Toca Fá
-                            setupPWM(NOTA_FA);
-                            cmd_LCD(1, 0);
-                            escreve_LCD("    Nota: Fa");
-                            cmd_LCD(0xC0,0); // Move o cursor para a segunda linha
-                            escreve_LCD("Frequencia:349Hz");
-                            break;
-                        case '8':
-                            // Toca Sol
-                            setupPWM(NOTA_SOL);
-                            cmd_LCD(1, 0);
-                            escreve_LCD("    Nota: Sol");
-                            cmd_LCD(0xC0,0); // Move o cursor para a segunda linha
-                            escreve_LCD("Frequencia:392Hz");
-                            break;
-                        case '5':
-                            // Toca Lá
-                            setupPWM(NOTA_LA);
-                            cmd_LCD(1, 0);
-                            escreve_LCD("    Nota: La");
-                            cmd_LCD(0xC0,0); // Move o cursor para a segunda linha
-                            escreve_LCD("Frequencia:440Hz");
-                            break;
-                        case '2':
-                            // Toca Si
-                            setupPWM(NOTA_SI);
-                            cmd_LCD(1, 0);
-                            escreve_LCD("    Nota: Si");
-                            cmd_LCD(0xC0,0); // Move o cursor para a segunda linha
-                            escreve_LCD("Frequencia:494Hz");
-                            break;
-                        case '#':
-                            // Selecionar
-                            cmd_LCD(1, 0);
-                            escreve_LCD("Selecionar");
-                            break;
-                        case '9':
-                            // Menos
-                            cmd_LCD(1, 0);
-                            escreve_LCD("Menos");
-                            break;
-                        case '6':
-                            // Mais
-                            cmd_LCD(1, 0);
-                            escreve_LCD("Mais");
-                            break;
-                        case '3':
-                            // Voltar
-                            cmd_LCD(1, 0);
-                            escreve_LCD("Voltar");
-                            break;
-                        default:
-                            stopPWM();
-                            break;
+                                    for (seq = 0; seq < num_notas; seq++) {
+                                        setupPWM(doremi[seq]);
+                                        __delay_cycles(150000);
+                                        stopPWM();
+                                        __delay_cycles(150000);
+                                    }
+
+                                } else if (menu_option == 1) {
+                                    cmd_LCD(1, 0);
+                                    escreve_LCD("Happy Birthday");
+                                    // Música "Happy Birthday"
+                                    int happy[] = {NOTA_DO, NOTA_DO, NOTA_RE, NOTA_DO, NOTA_FA, NOTA_MI, NOTA_DO, NOTA_DO, NOTA_RE, NOTA_DO, NOTA_RE, NOTA_RE};
+                                    int num_notas = sizeof(happy) / sizeof(happy[0]);
+
+                                    for (seq = 0; seq < num_notas; seq++) {
+                                        setupPWM(happy[seq]);
+                                        __delay_cycles(150000); // Ajuste o delay conforme necessário
+                                        stopPWM();
+                                        __delay_cycles(150000); // Ajuste o delay conforme necessário
+                                    }
+
+                                } else if (menu_option == 2) {
+                                    cmd_LCD(1, 0);
+                                    escreve_LCD("Ode The Joy");
+                                    // Música "Ode to Joy"
+                                    int ode[] = {NOTA_MI, NOTA_MI, NOTA_FA, NOTA_SOL, NOTA_SOL, NOTA_FA, NOTA_RE, NOTA_DO, NOTA_DO, NOTA_RE, NOTA_MI, NOTA_RE, NOTA_RE, NOTA_DO, NOTA_DO};
+                                    int num_notas = sizeof(ode) / sizeof(ode[0]);
+
+                                    for (seq = 0; seq < num_notas; seq++) {
+                                        setupPWM(ode[seq]);
+                                        __delay_cycles(150000); // Ajuste o delay conforme necessário
+                                        stopPWM();
+                                        __delay_cycles(150000); // Ajuste o delay conforme necessário
+                                    }
+                                }
+
+                                // Aguarda até que a tecla seja liberada
+                                while(!tst_bit(P2IN, j+3));
+                                break;
+                            case '3':  // Voltar
+                                menu_active = 0; // Sai do menu
+                                cmd_LCD(1, 0);
+                                escreve_LCD("Teclado Musical!");
+                                cmd_LCD(0xC0, 0);
+                                break;
+                        }
+
+                        // Atualiza o menu exibido
+                        if (menu_active) {
+                            cmd_LCD(1, 0); // Limpa o display
+                            if (menu_option == 0) {
+                                cmd_LCD(1, 0); // Limpa o display
+                                escreve_LCD("    Musics");
+                                cmd_LCD(0xC0, 0); // Move o cursor para a segunda linha
+                                escreve_LCD("DoReMi-_____-___");
+                            } else if (menu_option == 1) {
+                                cmd_LCD(1, 0); // Limpa o display
+                                escreve_LCD("    Musics");
+                                cmd_LCD(0xC0, 0); // Move o cursor para a segunda linha
+                                escreve_LCD("______-Happy-___");
+                            } else if (menu_option == 2) {
+                                cmd_LCD(1, 0); // Limpa o display
+                                escreve_LCD("    Musics");
+                                cmd_LCD(0xC0, 0); // Move o cursor para a segunda linha
+                                escreve_LCD("______-_____-Ode");
+                            }
+                        }
+
+                    } else {
+                        // Se o menu não estiver ativo
+                        switch(tecla) {
+                            case '*':
+                                menu_active = 1; // Ativa o menu
+                                cmd_LCD(1, 0); // Limpa o display
+                                escreve_LCD("    Musics");
+                                cmd_LCD(0xC0, 0); // Move o cursor para a segunda linha
+                                escreve_LCD("DoReMi-Happy-Ode");
+                                break;
+                            case '7':
+                                // Toca Dó
+                                setupPWM(NOTA_DO);
+                                cmd_LCD(1, 0);  // Comando para limpar o display
+                                escreve_LCD("    Nota: Do");
+                                cmd_LCD(0xC0,0); // Move o cursor para a segunda linha
+                                escreve_LCD("Frequencia:261Hz");
+                                break;
+                            case '4':
+                                // Toca Ré
+                                setupPWM(NOTA_RE);
+                                cmd_LCD(1, 0);
+                                escreve_LCD("    Nota: Re");
+                                cmd_LCD(0xC0,0); // Move o cursor para a segunda linha
+                                escreve_LCD("Frequencia:294Hz");
+                                break;
+                            case '1':
+                                // Toca Mi
+                                setupPWM(NOTA_MI);
+                                cmd_LCD(1, 0);
+                                escreve_LCD("    Nota: Mi");
+                                cmd_LCD(0xC0,0); // Move o cursor para a segunda linha
+                                escreve_LCD("Frequencia:330Hz");
+                                break;
+                            case '0':
+                                // Toca Fá
+                                setupPWM(NOTA_FA);
+                                cmd_LCD(1, 0);
+                                escreve_LCD("    Nota: Fa");
+                                cmd_LCD(0xC0,0); // Move o cursor para a segunda linha
+                                escreve_LCD("Frequencia:349Hz");
+                                break;
+                            case '8':
+                                // Toca Sol
+                                setupPWM(NOTA_SOL);
+                                cmd_LCD(1, 0);
+                                escreve_LCD("    Nota: Sol");
+                                cmd_LCD(0xC0,0); // Move o cursor para a segunda linha
+                                escreve_LCD("Frequencia:392Hz");
+                                break;
+                            case '5':
+                                // Toca Lá
+                                setupPWM(NOTA_LA);
+                                cmd_LCD(1, 0);
+                                escreve_LCD("    Nota: La");
+                                cmd_LCD(0xC0,0); // Move o cursor para a segunda linha
+                                escreve_LCD("Frequencia:440Hz");
+                                break;
+                            case '2':
+                                // Toca Si
+                                setupPWM(NOTA_SI);
+                                cmd_LCD(1, 0);
+                                escreve_LCD("    Nota: Si");
+                                cmd_LCD(0xC0,0); // Move o cursor para a segunda linha
+                                escreve_LCD("Frequencia:494Hz");
+                                break;
+                            case '#':
+                                // Selecionar
+                                cmd_LCD(1, 0);
+                                escreve_LCD("Selecionar");
+                                break;
+                            case '3':
+                                // Voltar
+                                cmd_LCD(1, 0);
+                                escreve_LCD("Voltar");
+                                break;
+                            default:
+                                stopPWM();
+                                break;
+                        }
+                        // Aguarda até que a tecla seja liberada
+                        while(!tst_bit(P2IN, j+3));
                     }
 
                     // Aguarda até que a tecla seja liberada
