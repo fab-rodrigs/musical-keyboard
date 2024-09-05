@@ -57,7 +57,7 @@ int main(void)
 
     escreve_LCD("Teclado Musical!");
     cmd_LCD(0xC0,0); // Move o cursor para a segunda linha
-    escreve_LCD("|/|/|/|/|/|/|/|/");
+    escreve_LCD("# # # # # # # #");
 
     unsigned char menu_option = 0; // Variável para rastrear a opção do menu
     unsigned char menu_active = 0; // Variável para saber se o menu está ativo
